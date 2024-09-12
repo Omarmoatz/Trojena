@@ -1,15 +1,15 @@
 volumes:
-  apps_local_postgres_data: {}
-  apps_local_postgres_data_backups: {}
-  apps_local_redis_data: {}
+  trojena_local_postgres_data: {}
+  trojena_local_postgres_data_backups: {}
+  trojena_local_redis_data: {}
 
 services:
   django: &django
     build:
       context: .
       dockerfile: ./compose/local/django/Dockerfile
-    image: apps_local_django
-    container_name: apps_local_django
+    image: trojena_local_django
+    container_name: trojena_local_django
     depends_on:
       - postgres
       - redis
@@ -27,32 +27,32 @@ services:
     build:
       context: .
       dockerfile: ./compose/production/postgres/Dockerfile
-    image: apps_production_postgres
-    container_name: apps_local_postgres
+    image: trojena_production_postgres
+    container_name: trojena_local_postgres
     volumes:
-      - apps_local_postgres_data:/var/lib/postgresql/data
-      - apps_local_postgres_data_backups:/backups
+      - trojena_local_postgres_data:/var/lib/postgresql/data
+      - trojena_local_postgres_data_backups:/backups
     env_file:
       - ./.envs/.local/.postgres
 
   mailpit:
     image: docker.io/axllent/mailpit:latest
-    container_name: apps_local_mailpit
+    container_name: trojena_local_mailpit
     ports:
       - "8025:8025"
 
   redis:
     image: docker.io/redis:6
-    container_name: apps_local_redis
+    container_name: trojena_local_redis
     
     volumes:
-      - apps_local_redis_data:/data
+      - trojena_local_redis_data:/data
     
 
   celeryworker:
     <<: *django
-    image: apps_local_celeryworker
-    container_name: apps_local_celeryworker
+    image: trojena_local_celeryworker
+    container_name: trojena_local_celeryworker
     depends_on:
       - redis
       - postgres
@@ -62,8 +62,8 @@ services:
 
   celerybeat:
     <<: *django
-    image: apps_local_celerybeat
-    container_name: apps_local_celerybeat
+    image: trojena_local_celerybeat
+    container_name: trojena_local_celerybeat
     depends_on:
       - redis
       - postgres
@@ -73,8 +73,8 @@ services:
 
   flower:
     <<: *django
-    image: apps_local_flower
-    container_name: apps_local_flower
+    image: trojena_local_flower
+    container_name: trojena_local_flower
     ports:
       - '5555:5555'
     command: /start-flower
